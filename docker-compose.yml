@@ -1,15 +1,8 @@
 version: "3.8"
 
 services:
-  zookeeper:
-    image: "docker-hub.repo01.vkbads.de/bitnami/zookeeper:3"
-    ports:
-      - "2181:2181"
-    volumes:
-      - "./v_zookeeper_data:/bitnami"
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
   kafka:
+    # image: "docker.io/bitnami/kafka:3.4.0"
     image: "docker-hub.repo01.vkbads.de/bitnami/kafka:3.4.0"
     ports:
       - "9092:9092"
@@ -17,12 +10,15 @@ services:
     volumes:
       - "./v_kafka_data:/bitnami"
     environment:
-      - KAFKA_ENABLE_KRAFT=no
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ENABLE_KRAFT=yes
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9093,EXTERNAL://:9092
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9093,EXTERNAL://:9092,CONTROLLER://:9094
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9093,EXTERNAL://localhost:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9094
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
     healthcheck:
       test: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
@@ -30,9 +26,8 @@ services:
       interval: 5s
       timeout: 10s
       retries: 10
-    depends_on:
-      - zookeeper
   akhq:
+    # image: "docker.io/tchiotludo/akhq:dev" # soablds ein neues reelease gibt, des nutzen
     image: "docker-hub.repo01.vkbads.de/tchiotludo/akhq:dev" # soablds ein neues reelease gibt, des nutzen
     ports:
       - "9080:8080"
