@@ -1,2 +1,2 @@
-.v_kafka_data/*
-!.v_kafka_data/.keep
+/v_kafka_data
+!/v_kafka_data/.keep
