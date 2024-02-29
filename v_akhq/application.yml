@@ -1,0 +1,9 @@
+akhq:
+  connections:
+    local:
+      properties:
+        bootstrap.servers: "kafka:9093"
+        sasl.jaas.config: "default"
+        sasl.login.callback.handler.class: "org.apache.kafka.common.security.plain.internals.PlainServerCallbackHandler"
+        security.protocol: "PLAINTEXT"
+        sasl.mechanism: "GSSAPI"
